@@ -3,20 +3,36 @@
 # Made by xeor 29. May 2011
 
 function handle_isight {
+    # Try whatever we can to disable the builtin isight camera.
+    # Some of the builtin apps like FaceTime wont start at all with this hack. Photo Booth starts, but have no cam.
+    # Skype is also without camera after this (gray screen). Metasploit hack to capture the isight camera will also fail
+    # and give you a output that its unable to load some libs..
+
+    files="/System/Library/QuickTime/QuickTimeUSBVDCDigitizer.component"
+    files="$files /System/Library/QuickTime/QuickTimeComponents.component/Contents/MacOS/QuickTimeComponents"
+    files="$files /System/Library/PrivateFrameworks/CoreMediaIOServicesPrivate.framework/Versions/A/Resources/VDC.plugin/Contents/MacOS/VDC"
+    files="$files /System/Library/PrivateFrameworks/CoreMediaIOServices.framework/Versions/A/Resources/VDC.plugin/Contents/MacOS/VDC"
+    files="$files /System/Library/PrivateFrameworks/CoreAUC.framework/Versions/A/CoreAUC"
+
     if [[ "$1" == "load" ]]; then
-	echo "loading cam"
-	chmod 755 /System/Library/PrivateFrameworks/CoreMediaIOServices.framework/Versions/A/Resources/VDC.plugin/Contents/MacOS/VDC
+	perm=755
     else
-	echo "unloading cam"
-	chmod 0 /System/Library/PrivateFrameworks/CoreMediaIOServices.framework/Versions/A/Resources/VDC.plugin/Contents/MacOS/VDC
+	perm=0
     fi
+
+    for f in $files; do
+	echo "Setting permission $perm on $f"
+	chmod $perm "$f"
+    done
+
+    echo "Apps that already [didn't] had access to the camera must be restarted.."
 }
 
 function handle_thunderbolt {
     if [[ "$1" == "load" ]]; then
-	echo "enabling the test module"
+	echo "not implemented"
     else
-	echo "disabling the test module"
+	echo "not implemented"
     fi
 }
 
