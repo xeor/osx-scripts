@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Made by xeor 29. May 2011
+
+function handle_isight {
+    if [[ "$1" == "load" ]]; then
+	echo "loading cam"
+	chmod 755 /System/Library/PrivateFrameworks/CoreMediaIOServices.framework/Versions/A/Resources/VDC.plugin/Contents/MacOS/VDC
+    else
+	echo "unloading cam"
+	chmod 0 /System/Library/PrivateFrameworks/CoreMediaIOServices.framework/Versions/A/Resources/VDC.plugin/Contents/MacOS/VDC
+    fi
+}
+
+function handle_thunderbolt {
+    if [[ "$1" == "load" ]]; then
+	echo "enabling the test module"
+    else
+	echo "disabling the test module"
+    fi
+}
+
+###################################################################
+###################################################################
+# Dont do anything below here.. All modules are above this line!" #
+###################################################################
+###################################################################
+
+if [[ "$(id -u)" != 0 ]]; then
+    echo "This utility need root to run."
+    exit 1
+fi
+
+mydir=$(cd $(dirname ${BASH_SOURCE:-$0});pwd)
+mypath="$mydir/$0"
+
+function get_all_modules {
+    # A little magic to get all the modules
+    all_modules=$(grep "function handle_" $mypath | grep -v grep | awk {'print $2'} | sed -e 's/handle_//g')
+    echo $all_modules
+}
+
+function get_modules {
+    if [[ "$1" == "" ]]; then
+	modules=$(get_all_modules)
+    else
+	modules=$*
+    fi
+    echo $modules
+}
+
+function do_action {
+    action=$1
+    shift
+    modules=$(get_modules $*)
+    for s in $modules; do
+	if grep -q "function handle_$s {" $mypath; then
+	    echo "** $action $s **"
+	    handle_$s $action
+	    echo
+	else
+	    echo "didnt find $s"
+	fi
+    done
+}
+
+t=$1
+shift
+
+case "$t" in
+    load)
+	do_action load $*
+	break
+	;;
+    unload)
+	do_action unload $*
+	break
+	;;
+    *)
+	echo "Use [load|unload] [module ...]"
+       	echo "All modules: $(get_all_modules)"
+	break
+	;;
+esac
