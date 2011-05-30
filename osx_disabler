@@ -86,15 +86,12 @@ shift
 case "$t" in
     load)
 	do_action load $*
-	break
 	;;
     unload)
 	do_action unload $*
-	break
 	;;
     *)
 	echo "Use [load|unload] [module ...]"
        	echo "All modules: $(get_all_modules)"
-	break
 	;;
 esac
