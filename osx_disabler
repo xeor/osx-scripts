@@ -28,6 +28,15 @@ function handle_isight {
     echo "Apps that already [didn't] had access to the camera must be restarted.."
 }
 
+function handle_firewire {
+    # try first: kextunload /System/Library/Extensions/IOFireWireFamily.kext/Contents/PlugIns/AppleFWOHCI.kext
+    # /System/Library/Extensions/IOFireWireFamily.kext + reboot
+
+    # load: kextload /System/Library/Extensions/IOFireWireFamily.kext/Contents/PlugIns/AppleFWOHCI.kext
+    # back with .kext
+    echo
+}
+
 function handle_thunderbolt {
     if [[ "$1" == "load" ]]; then
 	echo "not implemented"
